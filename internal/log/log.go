@@ -14,6 +14,11 @@ import (
 	api "ProLog/api/v1"
 )
 
+type OutOfRangeError struct {
+	off uint64
+	segmentMax uint64
+}
+
 type Log struct {
 	mu sync.RWMutex
 
@@ -101,8 +106,11 @@ func (l *Log) Read(off uint64) (*api.Record, error) {
 			break
 		}
 	}
-	if s == nil || s.nextOffset <= off {
-		return nil, fmt.Errorf("offset out of range: %d", off)
+	if s == nil {
+		return nil, newOutOfRangeError(off, 0)
+	}
+	if s.nextOffset <= off {
+		return nil, newOutOfRangeError(off, s.nextOffset)
 	}
 	return s.Read(off)
 }
@@ -201,3 +209,13 @@ func (o *originReader) Read(p []byte) (int, error) {
 	return n, err
 }
 
+func (o *OutOfRangeError) Error() string {
+	return fmt.Sprintf("outOfRange: requested %d, segment max %d", o.off, o.segmentMax)
+}
+
+func newOutOfRangeError(off, segmentMax uint64) *OutOfRangeError {
+	return &OutOfRangeError{
+		off: off,
+		segmentMax: segmentMax,
+	}
+}
