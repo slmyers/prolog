@@ -48,12 +48,17 @@ gencert:
 # START: begin
 	mv *.pem *.csr ${CONFIG_PATH}
 
-# END: begin
-# START: auth
 $(CONFIG_PATH)/model.conf:
 	cp test/model.conf $(CONFIG_PATH)/model.conf
 
 $(CONFIG_PATH)/policy.csv:
+	cp test/policy.csv $(CONFIG_PATH)/policy.csv
+
+# END: begin
+# START: auth
+.PHONY: auth
+auth:
+	cp test/model.conf $(CONFIG_PATH)/model.conf
 	cp test/policy.csv $(CONFIG_PATH)/policy.csv
 
 # START: begin
