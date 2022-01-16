@@ -1,0 +1,16 @@
+{
+    "CN": "Test Cert",
+    "key": {
+        "algo": "rsa",
+        "size": 2048
+    },
+    "names": [
+        {
+            "C": "CA",
+            "L": "AB",
+            "ST": "Edmonton",
+            "O": "Myers Tech Industries",
+            "OU": "Research"
+        }
+    ]
+}
