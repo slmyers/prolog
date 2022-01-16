@@ -106,11 +106,8 @@ func (l *Log) Read(off uint64) (*api.Record, error) {
 			break
 		}
 	}
-	if s == nil {
-		return nil, newOutOfRangeError(off, 0)
-	}
-	if s.nextOffset <= off {
-		return nil, newOutOfRangeError(off, s.nextOffset)
+	if s == nil || s.nextOffset <= off {
+		return nil, api.ErrOffsetOutOfRange{Offset: off}
 	}
 	return s.Read(off)
 }
