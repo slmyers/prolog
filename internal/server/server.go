@@ -32,9 +32,9 @@ type Config struct {
 
 const (
 	objectWildcard = "*"
+	logObject = "log"
 	produceAction  = "produce"
 	consumeAction  = "consume"
-	logSubject = "log"
 )
 
 var _ api.LogServer = (*grpcServer)(nil)
@@ -98,7 +98,7 @@ func (s *grpcServer) Produce(ctx context.Context, req *api.ProduceRequest) (
 	*api.ProduceResponse, error) {
 	if err := s.Authorizer.Authorize(
 		subject(ctx),
-		logSubject,
+		logObject,
 		produceAction,
 	); err != nil {
 		return nil, err
@@ -114,7 +114,7 @@ func (s *grpcServer) Consume(ctx context.Context, req *api.ConsumeRequest) (
 	*api.ConsumeResponse, error) {
 	if err := s.Authorizer.Authorize(
 		subject(ctx),
-		logSubject,
+		logObject,
 		consumeAction,
 	); err != nil {
 		return nil, err
