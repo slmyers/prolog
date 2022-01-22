@@ -13,7 +13,6 @@ var (
 	width = uint64(len(write)) + lenwidth
 )
 
-
 func TestAppendAndRead(t *testing.T) {
 	f, err := ioutil.TempFile("", "store_append_read_test")
 	require.NoError(t, err)
@@ -77,7 +76,7 @@ func TestStoreClose(t *testing.T) {
 
 	s, err := newStore(f)
 	require.NoError(t, err)
-	_,_,err = s.Append(write)
+	_, _, err = s.Append(write)
 	require.NoError(t, err)
 	f, beforeSize, err := openFile(f.Name())
 	require.NoError(t, err)

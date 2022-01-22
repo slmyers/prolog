@@ -55,7 +55,6 @@ func TestIndex(t *testing.T) {
 	require.Equal(t, entries[1].Pos, pos)
 }
 
-
 //func TestIndex(t *testing.T) {
 //	c := Config{}
 //	c.Segment.MaxIndexBytes = 1024

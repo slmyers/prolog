@@ -14,15 +14,15 @@ var (
 )
 
 type index struct {
-	file *os.File
-	mmap gommap.MMap
-	size uint64
+	file    *os.File
+	mmap    gommap.MMap
+	size    uint64
 	maxSize uint64
 }
 
 func newIndex(f *os.File, c Config) (*index, error) {
 	idx := &index{
-		file: f,
+		file:    f,
 		maxSize: c.Segment.MaxIndexBytes,
 	}
 	fi, err := os.Stat(f.Name())
@@ -46,6 +46,7 @@ func newIndex(f *os.File, c Config) (*index, error) {
 	}
 	return idx, nil
 }
+
 // Close is there going to be some nasty ass bug from the failing of files to truncate? Will it go away when
 // not being on my windoze?
 func (i *index) Close() error {
