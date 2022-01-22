@@ -16,7 +16,6 @@ type segment struct {
 	config                 Config
 }
 
-
 func newSegment(dir string, baseOffset uint64, c Config) (*segment, error) {
 	s := &segment{
 		baseOffset: baseOffset,
@@ -53,7 +52,6 @@ func newSegment(dir string, baseOffset uint64, c Config) (*segment, error) {
 	return s, nil
 }
 
-
 func (s *segment) Append(record *api.Record) (offset uint64, err error) {
 	cur := s.nextOffset
 	record.Offset = cur
@@ -76,7 +74,6 @@ func (s *segment) Append(record *api.Record) (offset uint64, err error) {
 	return cur, nil
 }
 
-
 func (s *segment) Read(off uint64) (*api.Record, error) {
 	_, pos, err := s.index.Read(int64(off - s.baseOffset))
 	if err != nil {
@@ -91,12 +88,10 @@ func (s *segment) Read(off uint64) (*api.Record, error) {
 	return record, err
 }
 
-
 func (s *segment) IsMaxed() bool {
 	return s.store.size >= s.config.Segment.MaxStoreBytes ||
 		s.index.size >= s.config.Segment.MaxIndexBytes
 }
-
 
 func (s *segment) Close() error {
 	if err := s.index.Close(); err != nil {
@@ -107,7 +102,6 @@ func (s *segment) Close() error {
 	}
 	return nil
 }
-
 
 func (s *segment) Remove() error {
 	if err := s.Close(); err != nil {
@@ -122,7 +116,6 @@ func (s *segment) Remove() error {
 	return nil
 }
 
-
 func nearestMultiple(j, k uint64) uint64 {
 	if j >= 0 {
 		return (j / k) * k
@@ -130,4 +123,3 @@ func nearestMultiple(j, k uint64) uint64 {
 	return ((j - k + 1) / k) * k
 
 }
-

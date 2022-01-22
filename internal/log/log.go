@@ -15,7 +15,7 @@ import (
 )
 
 type OutOfRangeError struct {
-	off uint64
+	off        uint64
 	segmentMax uint64
 }
 
@@ -28,7 +28,6 @@ type Log struct {
 	activeSegment *segment
 	segments      []*segment
 }
-
 
 func NewLog(dir string, c Config) (*Log, error) {
 	if c.Segment.MaxStoreBytes == 0 {
@@ -44,7 +43,6 @@ func NewLog(dir string, c Config) (*Log, error) {
 
 	return l, l.setup()
 }
-
 
 func (l *Log) setup() error {
 	files, err := ioutil.ReadDir(l.Dir)
@@ -95,7 +93,6 @@ func (l *Log) Append(record *api.Record) (uint64, error) {
 	return off, err
 }
 
-
 func (l *Log) Read(off uint64) (*api.Record, error) {
 	l.mu.RLock()
 	defer l.mu.RUnlock()
@@ -112,7 +109,6 @@ func (l *Log) Read(off uint64) (*api.Record, error) {
 	return s.Read(off)
 }
 
-
 func (l *Log) newSegment(off uint64) error {
 	s, err := newSegment(l.Dir, off, l.Config)
 	if err != nil {
@@ -122,7 +118,6 @@ func (l *Log) newSegment(off uint64) error {
 	l.activeSegment = s
 	return nil
 }
-
 
 func (l *Log) Close() error {
 	l.mu.Lock()
@@ -149,7 +144,6 @@ func (l *Log) Reset() error {
 	return l.setup()
 }
 
-
 func (l *Log) LowestOffset() (uint64, error) {
 	l.mu.RLock()
 	defer l.mu.RUnlock()
@@ -165,7 +159,6 @@ func (l *Log) HighestOffset() (uint64, error) {
 	}
 	return off - 1, nil
 }
-
 
 func (l *Log) Truncate(lowest uint64) error {
 	l.mu.Lock()
@@ -183,7 +176,6 @@ func (l *Log) Truncate(lowest uint64) error {
 	l.segments = segments
 	return nil
 }
-
 
 func (l *Log) Reader() io.Reader {
 	l.mu.RLock()
@@ -212,7 +204,7 @@ func (o *OutOfRangeError) Error() string {
 
 func newOutOfRangeError(off, segmentMax uint64) *OutOfRangeError {
 	return &OutOfRangeError{
-		off: off,
+		off:        off,
 		segmentMax: segmentMax,
 	}
 }

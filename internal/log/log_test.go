@@ -35,7 +35,6 @@ func TestLog(t *testing.T) {
 	}
 }
 
-
 func testAppendRead(t *testing.T, log *Log) {
 	append := &api.Record{
 		Value: []byte("hello world"),
@@ -49,13 +48,11 @@ func testAppendRead(t *testing.T, log *Log) {
 	require.Equal(t, append.Value, read.Value)
 }
 
-
 func testOutOfRangeErr(t *testing.T, log *Log) {
 	read, err := log.Read(1)
 	require.Nil(t, read)
 	require.Error(t, err)
 }
-
 
 func testInitExisting(t *testing.T, o *Log) {
 	append := &api.Record{
@@ -85,7 +82,6 @@ func testInitExisting(t *testing.T, o *Log) {
 	require.Equal(t, uint64(2), off)
 }
 
-
 func testReader(t *testing.T, log *Log) {
 	append := &api.Record{
 		Value: []byte("hello world"),
@@ -104,7 +100,6 @@ func testReader(t *testing.T, log *Log) {
 	require.Equal(t, append.Value, read.Value)
 }
 
-
 func testTruncate(t *testing.T, log *Log) {
 	append := &api.Record{
 		Value: []byte("hello world"),
@@ -120,4 +115,3 @@ func testTruncate(t *testing.T, log *Log) {
 	_, err = log.Read(0)
 	require.Error(t, err)
 }
-

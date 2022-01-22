@@ -26,13 +26,14 @@ import (
 type Config struct {
 	CommitLog       CommitLog
 	Authorizer      *auth.Authorizer
+	GetServerer     GetServerer
 	OutOfBoundError error
 	NotFoundError   error
 }
 
 const (
 	objectWildcard = "*"
-	logObject = "log"
+	logObject      = "log"
 	produceAction  = "produce"
 	consumeAction  = "consume"
 )
@@ -84,7 +85,7 @@ func NewGRPCServer(config *Config, opts ...grpc.ServerOption) (
 		grpcauth.UnaryServerInterceptor(authenticate),
 	))
 
-	opts = append(opts, streamInterceptor, unaryInterceptor, grpc.StatsHandler(&ocgrpc.ServerHandler{}),)
+	opts = append(opts, streamInterceptor, unaryInterceptor, grpc.StatsHandler(&ocgrpc.ServerHandler{}))
 	gsrv := grpc.NewServer(opts...)
 	srv, err := newgrpcServer(config)
 	if err != nil {
@@ -167,6 +168,21 @@ func (s *grpcServer) ConsumeStream(
 			req.Offset++
 		}
 	}
+}
+
+func (s *grpcServer) GetServers(
+	ctx context.Context, req *api.GetServersRequest,
+) (
+	*api.GetServersResponse, error) {
+	servers, err := s.GetServerer.GetServers()
+	if err != nil {
+		return nil, err
+	}
+	return &api.GetServersResponse{Servers: servers}, nil
+}
+
+type GetServerer interface {
+	GetServers() ([]*api.Server, error)
 }
 
 type CommitLog interface {

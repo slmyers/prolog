@@ -20,7 +20,7 @@ type store struct {
 	*os.File
 	mu sync.Mutex
 	// TODO: study io Writer
-	buf *bufio.Writer
+	buf  *bufio.Writer
 	size uint64
 }
 
@@ -33,7 +33,7 @@ func newStore(f *os.File) (*store, error) {
 	return &store{
 		File: f,
 		size: size,
-		buf: bufio.NewWriter(f),
+		buf:  bufio.NewWriter(f),
 	}, nil
 }
 
@@ -48,7 +48,7 @@ func (s *store) Append(p []byte) (n uint64, pos uint64, err error) {
 	pos = s.size
 	// writes the length in binary into the buffer
 	if err := binary.Write(s.buf, enc, uint64(len(p))); err != nil {
-		return 0,0, err
+		return 0, 0, err
 	}
 	// writes the data
 	w, err := s.buf.Write(p)
