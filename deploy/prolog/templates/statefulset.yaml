@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "prolog.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{ include "prolog.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels: {{ include "prolog.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "prolog.fullname" . }}
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      name: {{ include "prolog.fullname" . }}
+      labels: {{ include "prolog.labels" . | nindent 8 }}
+    spec:
+      # initContainers...
+      initContainers:
+      - name: {{ include "prolog.fullname" . }}-config-init
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        command:          
+          - /bin/sh
+          - -c
+          - |-
+            ID=$(echo $HOSTNAME | rev | cut -d- -f1 | rev)
+            cat > /var/run/prolog/config.yaml <<EOD
+            data-dir: /var/run/prolog/data
+            rpc-port: {{.Values.rpcPort}}
+            # Make sure the following three key-values are on one line each in
+            # your code. I split them across multiple lines to fit them in
+            # for the book.
+            bind-addr: \
+              "$HOSTNAME.prolog.{{.Release.Namespace}}.\svc.cluster.local:\
+                {{.Values.serfPort}}"
+            bootstrap: $([ $ID = 0 ] && echo true || echo false)
+            $([ $ID != 0 ] && echo 'start-join-addrs: \
+              "prolog-0.prolog.{{.Release.Namespace}}.svc.cluster.local:\
+                {{.Values.serfPort}}"')
+            EOD   
+        volumeMounts:
+        - name: datadir
+          mountPath: /var/run/prolog
+      # containers...
+      containers:
+      - name: {{ include "prolog.fullname" . }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        ports:
+        - containerPort: {{ .Values.rpcPort }}
+          name: rpc
+        - containerPort: {{ .Values.serfPort }}
+          name: serf
+        args:
+          - --config-file=/var/run/prolog/config.yaml
+        # probes...
+        readinessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:{{ .Values.rpcPort }}"]
+          initialDelaySeconds: 10
+        livenessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:{{ .Values.rpcPort }}"]
+          initialDelaySeconds: 10
+        volumeMounts:
+        - name: datadir
+          mountPath: /var/run/prolog
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.storage }}
