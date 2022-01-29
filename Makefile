@@ -1,5 +1,5 @@
 # START: begin
-CONFIG_PATH=${HOME}/.proglog/
+CONFIG_PATH=${HOME}/.prolog/
 
 .PHONY: init
 init:
@@ -82,3 +82,11 @@ compile:
 		--proto_path=.
 
 # END: begin
+
+# START: build_docker
+TAG ?= 0.0.1
+
+build-docker:
+	docker build -t github.com/slmyers/prolog:$(TAG) .
+
+# END: build_docker
